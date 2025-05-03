@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// App.js
+import React,{useState,useEffect} from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Login from './screens/login/Login';
+import Sidebar from './layout/SideBar';
+import Navbar from './layout/NavBar';
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [user,setUser] = useState(null)
+
+
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {
+        user ? (
+          
+       <Sidebar  isOpen={sidebarOpen} setIsOpen={setSidebarOpen}>
+
+       </Sidebar>
+        ): (
+      <Routes>
+        <Route path="/" element={<Login />} />
+      </Routes>
+            
+        )
+      }
     </>
-  )
+   
+  );
 }
 
-export default App
+export default App;

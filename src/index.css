@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+@theme{
+     --color-pesalink-blue: #003f4d;
+    --color-pesalink-teal: #01888a;
+    --color-pesalink-teal-hover: #026e70;
+    --color-pesalink-dark: #0b3d4a;
+    --color-pesalink-orange: #f46d3b;
+}
