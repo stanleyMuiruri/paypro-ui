@@ -3,15 +3,10 @@ import { FaUserCircle, FaSignOutAlt, FaChevronDown } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from '../assets/pesalink_logo_new.jpg'
 
-const Navbar = ({ role, isOpen, isMobile }) => {
+const Navbar = ({ isOpen, isMobile }) => {
 
-  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState("Select Company");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const navigate = useNavigate();
-
-  // Dummy Company List (Replace with API data later)
-  const companies = ["Rift Cars", "AutoX", "Speed Motors", "Elite Rides"];
 
   // Handle Logout
   const handleLogout = () => {

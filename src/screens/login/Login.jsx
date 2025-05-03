@@ -1,16 +1,35 @@
 // LoginPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../../assets/pesalink_logo_new.jpg';
+import { encryptData } from '../../utils/authUtils';
+import Loader from '../../component/ Loader';
+import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
+export default function LoginPage({ setUser, onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+
+  // Simulate loading delay on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = (e) => {
+    setLoading(true)
     e.preventDefault();
     console.log({ email, password });
-    localStorage.setItem("user",email)
+    localStorage.setItem("user", encryptData({ email }));
+    onLogin()
+    navigate('/dashboard')
+
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--color-pesalink-dark)] px-4">

@@ -28,7 +28,7 @@ const Sidebar = ({ children, isOpen, setIsOpen }) => {
   }, []);
 
   const menuItems = [
-    { name: "Dashboard", path: "/admin/dashboard", icon: <FaTachometerAlt /> },
+    { name: "Dashboard", path: "/dashboard", icon: <FaTachometerAlt /> },
   ];
 
   return (
