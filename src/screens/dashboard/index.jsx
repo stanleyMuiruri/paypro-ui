@@ -5,11 +5,17 @@ import { parseStringPromise } from 'xml2js';
 const validData = [
     { accountToken: 'ACC1234567890', bankCode: 'KEN001', amount: 5000, reference: 'REF001', status: 'Processed', error: '' },
     { accountToken: 'ACC0987654321', bankCode: 'KEN002', amount: 12000, reference: 'REF002', status: 'Processed', error: '' },
+    { accountToken: 'ACC3333333333', bankCode: 'KEN003', amount: 8000, reference: 'REF004', status: 'Processed', error: '' },
+    { accountToken: 'ACC4444444444', bankCode: 'KEN001', amount: 2500, reference: 'REF005', status: 'Processed', error: '' },
+    { accountToken: 'ACC5555555555', bankCode: 'KEN004', amount: 10000, reference: 'REF006', status: 'Processed', error: '' },
+    { accountToken: 'ACC6666666666', bankCode: 'KEN005', amount: 15000, reference: 'REF007', status: 'Processed', error: '' },
 ];
 
 const invalidData = [
     { accountToken: '', bankCode: 'KEN003', amount: 7000, reference: 'REF003', status: 'Failed', error: 'Missing accountToken' },
     { accountToken: 'ACC7777777777', bankCode: '', amount: null, reference: '', status: 'Rejected', error: 'Invalid bankCode and missing reference' },
+    { accountToken: 'ACC8888888888', bankCode: 'KEN999', amount: -200, reference: 'REF008', status: 'Failed', error: 'Negative amount' },
+    { accountToken: 'ACC9999999999', bankCode: 'KEN001', amount: 0, reference: 'REF009', status: 'Failed', error: 'Zero amount' },
 ];
 
 const Dashboard = () => {
@@ -22,9 +28,18 @@ const Dashboard = () => {
 
     const data = tab === 'valid' ? validData : invalidData;
     const headers = ['accountToken', 'bankCode', 'amount', 'reference', 'status', 'error'];
-
     const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
     const totalPages = Math.ceil(data.length / itemsPerPage);
+
+    const totalAccounts = validData.length + invalidData.length;
+    const validAccounts = validData.length;
+    const invalidAccounts = invalidData.length;
+    const totalValidAmount = validData.reduce((sum, acc) => sum + (acc.amount || 0), 0);
+    const totalInvalidAmount = invalidData.reduce((sum, acc) => sum + (acc.amount || 0), 0);
+    const uniqueBankCodes = new Set([
+        ...validData.map((d) => d.bankCode),
+        ...invalidData.map((d) => d.bankCode)
+    ].filter(Boolean)).size;
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -90,7 +105,8 @@ const Dashboard = () => {
                             </button>
                             <button
                                 onClick={handleFileImport}
-                                className="px-4 py-2 text-sm rounded bg-[var(--color-pesalink-teal)] hover:bg-[var(--color-pesalink-teal-hover)] text-white"
+                                className="px-4 py-2 text-sm rounded text-white"
+                                style={{ backgroundColor: 'var(--color-pesalink-teal)' }}
                             >
                                 Confirm Import
                             </button>
@@ -99,6 +115,16 @@ const Dashboard = () => {
                 </div>
             )}
 
+            {/* Statistics */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-6 text-center">
+                <StatBox title="Total Accounts" value={totalAccounts} bgColor="var(--color-pesalink-blue)" />
+                <StatBox title="Valid Accounts" value={validAccounts} bgColor="var(--color-pesalink-teal)" />
+                <StatBox title="Invalid Accounts" value={invalidAccounts} bgColor="var(--color-pesalink-orange)" />
+                <StatBox title="Valid Amount" value={`KES ${totalValidAmount.toLocaleString()}`} bgColor="var(--color-pesalink-teal-hover)" />
+                <StatBox title="Invalid Amount" value={`KES ${totalInvalidAmount.toLocaleString()}`} bgColor="var(--color-pesalink-dark)" />
+                <StatBox title="Bank Codes" value={uniqueBankCodes} bgColor="var(--color-pesalink-blue)" />
+            </div>
+
             {/* Tabs */}
             <div className="flex border-b mb-6">
                 {['valid', 'invalid'].map(type => (
@@ -106,10 +132,10 @@ const Dashboard = () => {
                         key={type}
                         onClick={() => { setTab(type); setCurrentPage(1); }}
                         className={`px-6 py-2 font-semibold text-sm uppercase border-b-4 transition-all duration-200 ${tab === type
-                            ? type === 'valid'
-                                ? 'border-[var(--color-pesalink-teal)] text-[var(--color-pesalink-teal)]'
-                                : 'border-[var(--color-pesalink-orange)] text-[var(--color-pesalink-orange)]'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                ? type === 'valid'
+                                    ? 'text-[var(--color-pesalink-teal)] border-[var(--color-pesalink-teal)]'
+                                    : 'text-[var(--color-pesalink-orange)] border-[var(--color-pesalink-orange)]'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -120,7 +146,10 @@ const Dashboard = () => {
             {/* Export & Import */}
             <div className="flex justify-between mb-4">
                 <div>
-                    <label className="bg-[var(--color-pesalink-orange)] text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md cursor-pointer">
+                    <label
+                        className="text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md cursor-pointer"
+                        style={{ backgroundColor: 'var(--color-pesalink-orange)' }}
+                    >
                         Import File
                         <input type="file" accept=".json,.xml,.xlsx" onChange={handleFileChange} className="hidden" />
                     </label>
@@ -129,7 +158,8 @@ const Dashboard = () => {
                     {['CSV', 'Excel', 'XML'].map(type => (
                         <button
                             key={type}
-                            className="bg-[var(--color-pesalink-teal)] hover:bg-[var(--color-pesalink-teal-hover)] text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md"
+                            className="text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md transition hover:shadow-lg"
+                            style={{ backgroundColor: 'var(--color-pesalink-teal)' }}
                         >
                             {type}
                         </button>
@@ -154,7 +184,7 @@ const Dashboard = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
                         {paginatedData.map((row, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50">
+                            <tr key={idx} className="hover:bg-[var(--color-pesalink-blue)]/5 transition duration-150">
                                 {headers.map((h, i) => (
                                     <td key={i} className="px-6 py-4 text-gray-700 whitespace-nowrap">{row[h] || '-'}</td>
                                 ))}
@@ -187,5 +217,12 @@ const Dashboard = () => {
         </div>
     );
 };
+
+const StatBox = ({ title, value, bgColor }) => (
+    <div className="p-4 rounded-lg shadow-md text-white" style={{ backgroundColor: bgColor }}>
+        <p className="text-xs">{title}</p>
+        <p className="text-lg font-semibold">{value}</p>
+    </div>
+);
 
 export default Dashboard;

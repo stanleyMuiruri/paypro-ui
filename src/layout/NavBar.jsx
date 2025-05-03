@@ -10,7 +10,8 @@ const Navbar = ({ isOpen, isMobile }) => {
 
   // Handle Logout
   const handleLogout = () => {
-    localStorage.clear();         
+    localStorage.clear();   
+    navigate("/")
     window.location.reload();     
   };
 
